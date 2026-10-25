@@ -1,7 +1,7 @@
 // Offline support: app files network-first (so updates arrive), fonts cache-first.
 // Prefixed so this app never deletes the Einmaleins-Dojo's cache when both share an origin.
 const PREFIX = 'plus-dojo-';
-const CACHE = PREFIX + '1.0.2';
+const CACHE = PREFIX + '1.0.3';
 const APP = ['./', 'index.html', 'manifest.webmanifest', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {

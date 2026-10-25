@@ -220,6 +220,7 @@ body.master .moon{box-shadow:0 0 60px rgba(255,216,74,.45)}
 .cert .date{color:#6b6250;font-size:.9rem}
 .fx{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:60}
 .app-footer{margin:8px 0 0;text-align:center;color:var(--dim);font-size:.75rem;font-weight:700;letter-spacing:.04em}
+.reload-link{background:none;border:none;padding:6px 0;font-size:inherit;font-weight:inherit;letter-spacing:inherit;color:inherit;text-decoration:underline;text-underline-offset:2px}
 
 @media (max-width:420px){
   .hero{grid-template-columns:120px 1fr}
@@ -379,7 +380,7 @@ body.master .moon{box-shadow:0 0 60px rgba(255,216,74,.45)}
     </div>
   </section>
 
-  <p class="app-footer" id="appVersion"></p>
+  <p class="app-footer"><span id="appVersion"></span><span id="reloadWrap"> · <button type="button" class="reload-link" id="reloadBtn">Neu laden</button></span></p>
 </div>
 
 <script>
@@ -399,8 +400,13 @@ body.master .moon{box-shadow:0 0 60px rgba(255,216,74,.45)}
   let muted = !!store.get('plus.muted', false);
   let master = store.get('plus.master', null);   // {date, name}: set once all 30 shuriken are reached, never lost by mistakes
 
-  const VERSION = '1.0.2';
+  const VERSION = '1.0.3';
   $('#appVersion').textContent = `Plus-Dojo · Version ${VERSION}`;
+  // Home-screen apps have no reload button. App files are network-first, so a reload picks up a new version when online.
+  $('#reloadBtn').addEventListener('click', () => {
+    const sw = navigator.serviceWorker;
+    Promise.resolve(sw && sw.getRegistration()).then(r => r && r.update()).catch(() => {}).finally(() => location.reload());
+  });
 
   const BELTS = [
     {min:0,  name:'Weißer',    dat:'weißen',    color:'#f5f3ea', edge:'#bdb8a6'},
@@ -550,7 +556,8 @@ body.master .moon{box-shadow:0 0 60px rgba(255,216,74,.45)}
     return out.map(c => makeItem(c.r, c.k, true));
   }
 
-  function show(id){ ['dojo','game','result','master'].forEach(s => $('#'+s).hidden = s !== id); window.scrollTo(0,0); }
+  // The reload link is hidden during training so a stray tap can't end a round.
+  function show(id){ ['dojo','game','result','master'].forEach(s => $('#'+s).hidden = s !== id); $('#reloadWrap').hidden = id === 'game'; window.scrollTo(0,0); }
 
   function renderLanterns(el, lit, popIdx=-1){
     el.innerHTML = '';
